@@ -9,7 +9,7 @@ from fabric.operations import run, put
 from datetime import datetime
 
 
-env.hosts = ['3.227.217.150', '3.95.27.202']
+env.hosts = ['34.201.164.207', '54.84.88.116']
 env.user = "ubuntu"
 
 
@@ -29,7 +29,7 @@ def do_pack():
     now = datetime.now().strftime("%Y%m%d%H%M%S")
 
     # create folder versions if it doesn’t exist
-    local("mkdir -p versions")
+    local("sudo mkdir -p versions")
 
     # extract the contents of a tar archive
     result = local("tar -czvf versions/web_static_{}.tgz web_static"
@@ -64,27 +64,27 @@ def do_deploy(archive_path):
         put(archive_path, "/tmp/{}".format(file_name))
 
         # Create new directory for release
-        run("mkdir -p {}".format(folder_path))
+        run("sudo mkdir -p {}".format(folder_path))
 
         # Untar archive
-        run("tar -xzf /tmp/{} -C {}".format(file_name, folder_path))
+        run("sudo tar -xzf /tmp/{} -C {}".format(file_name, folder_path))
 
         # Delete the archive from the web server
-        run("rm -rf /tmp/{}".format(file_name))
+        run("sudo rm -rf /tmp/{}".format(file_name))
 
         # Move extraction to proper directory
-        run("mv {}web_static/* {}".format(folder_path, folder_path))
+        run("sudo mv {}web_static/* {}".format(folder_path, folder_path))
 
         # Delete first copy of extraction after move
-        run("rm -rf {}web_static".format(folder_path))
+        run("sudo rm -rf {}web_static".format(folder_path))
 
         # Delete the symbolic link /data/web_static/current from the web server
-        run("rm -rf /data/web_static/current")
+        run("sudo rm -rf /data/web_static/current")
 
         # Create new the symbolic link /data/web_static/current on web server,
         # linked to the new version of your code,
         # (/data/web_static/releases/<archive filename without extension>
-        run("ln -s {} /data/web_static/current".format(folder_path))
+        run("sudo ln -s {} /data/web_static/current".format(folder_path))
 
         print('New version deployed!')
         success = True
